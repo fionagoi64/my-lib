@@ -118,7 +118,7 @@ export default function LibraryReaderPortalLoginPage() {
     e.preventDefault();
     setAuthError("");
     loginMutation.mutate(
-      { email, password },
+      { email: email.trim().toLowerCase(), password },
       {
         onSuccess: (data) => {
           if (typeof window !== "undefined") {
@@ -264,7 +264,7 @@ export default function LibraryReaderPortalLoginPage() {
                 </div>
 
                 {authError && (
-                  <div className="p-3 mb-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-medium text-center">
+                  <div role="alert" className="p-3 mb-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-medium text-center">
                     ⚠️ {authError === "Invalid email or password" ? t("landing.invalidCredentials") : authError}
                   </div>
                 )}
@@ -281,9 +281,11 @@ export default function LibraryReaderPortalLoginPage() {
                     <input
                       type="email"
                       required
+                      autoComplete="email"
+                      aria-invalid={Boolean(authError)}
                       placeholder={t("landing.emailPlaceholder")}
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={(e) => { setEmail(e.target.value); setAuthError(""); }}
                       className="w-full bg-zinc-950 border border-zinc-850 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-xl px-4 py-3 text-sm outline-none transition-all text-white"
                     />
                   </div>
@@ -302,9 +304,12 @@ export default function LibraryReaderPortalLoginPage() {
                       <input
                         type={showPassword ? "text" : "password"}
                         required
+                        minLength={8}
+                        autoComplete="current-password"
+                        aria-invalid={Boolean(authError)}
                         placeholder={t("landing.passwordPlaceholder")}
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        onChange={(e) => { setPassword(e.target.value); setAuthError(""); }}
                         className="w-full bg-zinc-950 border border-zinc-850 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-xl pl-4 pr-12 py-3 text-sm outline-none transition-all text-white"
                       />
                       <button
