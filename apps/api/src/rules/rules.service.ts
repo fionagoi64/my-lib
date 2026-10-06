@@ -1,14 +1,40 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@/prisma/prisma.service';
 import { CreateRuleDto } from './dto/create-rule.dto';
+import { RulesQueryDto } from './dto/rules-query.dto';
 
 @Injectable()
 export class RulesService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll() {
+  async findAll(query: RulesQueryDto) {
+    const where = {
+      deletedAt: null,
+      ...(query.q?.trim()
+        ? {
+            OR: [
+              { title: { contains: query.q.trim(), mode: 'insensitive' as const } },
+              { content: { contains: query.q.trim(), mode: 'insensitive' as const } },
+            ],
+          }
+        : {}),
+    };
+
+    if (query.page !== undefined && query.limit !== undefined) {
+      const [data, total] = await Promise.all([
+        this.prisma.libraryRule.findMany({
+          where,
+          skip: (query.page - 1) * query.limit,
+          take: query.limit,
+          orderBy: { updatedAt: 'desc' },
+        }),
+        this.prisma.libraryRule.count({ where }),
+      ]);
+      return { data, meta: { total, page: query.page, limit: query.limit, totalPages: Math.ceil(total / query.limit) } };
+    }
+
     return this.prisma.libraryRule.findMany({
-      where: { deletedAt: null },
+      where,
       orderBy: { id: 'asc' },
     });
   }

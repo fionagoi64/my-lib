@@ -6,13 +6,15 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { RulesService } from './rules.service';
 import { CreateRuleDto } from './dto/create-rule.dto';
+import { RulesQueryDto } from './dto/rules-query.dto';
 
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/auth/guards/roles.guard';
@@ -29,8 +31,11 @@ export class RulesController {
     description: 'Retrieves all non-deleted library regulations and parameters.',
   })
   @ApiResponse({ status: 200, description: 'Rules returned successfully.' })
-  findAll() {
-    return this.rulesService.findAll();
+  @ApiQuery({ name: 'q', required: false, description: 'Search rule title and policy text' })
+  @ApiQuery({ name: 'page', required: false, description: 'Optional page number (requires limit)' })
+  @ApiQuery({ name: 'limit', required: false, description: 'Optional page size, 1 to 100 (requires page)' })
+  findAll(@Query() query: RulesQueryDto) {
+    return this.rulesService.findAll(query);
   }
 
   @Post()
