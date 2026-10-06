@@ -32,6 +32,7 @@ export default function AdminCategoriesPage() {
 
   const [catName, setCatName] = useState("");
   const [catDesc, setCatDesc] = useState("");
+  const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
   const { data: categories, refetch: refetchCategories } = useCategories();
   const createCategoryMutation = useCreateCategory();
@@ -40,16 +41,16 @@ export default function AdminCategoriesPage() {
   const handleAddCategory = (e: React.FormEvent) => {
     e.preventDefault();
     createCategoryMutation.mutate(
-      { name: catName, description: catDesc || undefined },
+      { name: catName.trim(), description: catDesc.trim() || undefined },
       {
         onSuccess: () => {
-          alert("Category registered!");
+          setFeedback({ type: "success", message: "Category created successfully." });
           setCatName("");
           setCatDesc("");
           refetchCategories();
         },
         onError: (err: any) => {
-          alert(err.response?.data?.message || "Error adding category");
+          setFeedback({ type: "error", message: err.response?.data?.message || "Could not create category." });
         },
       }
     );
@@ -58,11 +59,11 @@ export default function AdminCategoriesPage() {
   const handleDeleteCategory = (id: number) => {
     deleteCategoryMutation.mutate(id, {
       onSuccess: () => {
-        alert("Category deleted successfully.");
+        setFeedback({ type: "success", message: "Category deleted successfully." });
         refetchCategories();
       },
       onError: (err: any) => {
-        alert(err.response?.data?.message || "Cannot delete category containing books.");
+        setFeedback({ type: "error", message: err.response?.data?.message || "Cannot delete a category containing books." });
       },
     });
   };
@@ -73,6 +74,8 @@ export default function AdminCategoriesPage() {
         <h3 className="text-xl font-extrabold text-white tracking-tight">Book Categories</h3>
         <p className="text-zinc-500 text-xs">Manage book classification genres in the library catalog.</p>
       </div>
+
+      {feedback && <div role={feedback.type === "error" ? "alert" : "status"} className={`rounded-xl border px-4 py-3 text-sm ${feedback.type === "error" ? "border-red-500/30 bg-red-500/10 text-red-300" : "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"}`}>{feedback.message}</div>}
 
       <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
         {/* Add Category Form */}
@@ -85,7 +88,10 @@ export default function AdminCategoriesPage() {
               required
               placeholder="Science Fiction"
               value={catName}
-              onChange={(e) => setCatName(e.target.value)}
+              onChange={(e) => {
+                setCatName(e.target.value);
+                setFeedback(null);
+              }}
               className="w-full bg-zinc-950 border border-zinc-850 focus:border-red-500 rounded-xl px-4 py-2.5 text-xs outline-none text-white transition-all"
             />
           </div>
@@ -101,9 +107,10 @@ export default function AdminCategoriesPage() {
           </div>
           <button
             type="submit"
+            disabled={createCategoryMutation.isPending}
             className="w-full py-2.5 bg-red-600 hover:bg-red-700 active:scale-95 transition-all text-white font-bold rounded-xl text-xs cursor-pointer border-none outline-none"
           >
-            Add Category
+            {createCategoryMutation.isPending ? "Adding…" : "Add Category"}
           </button>
         </form>
 
