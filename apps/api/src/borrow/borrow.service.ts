@@ -44,13 +44,25 @@ export class BorrowService {
     dueDate.setDate(dueDate.getDate() + 14); // 14-day standard loan period
 
     return this.prisma.$transaction(async (tx) => {
-      // Decrement available stock
-      await tx.book.update({
-        where: { id: bookId },
-        data: {
-          stockAvailable: { decrement: 1 },
-        },
+      // Re-check the active loan in the same transaction. The earlier lookup
+      // improves the common error path, while this prevents two concurrent
+      // requests from checking out the same title twice for one reader.
+      const activeLoan = await tx.borrowRecord.findFirst({
+        where: { userId, bookId, status: 'BORROWED' },
       });
+      if (activeLoan) {
+        throw new ConflictException('You have already checked out a copy of this book and have not returned it yet.');
+      }
+
+      // Update conditionally rather than decrementing blindly. `count === 0`
+      // means another transaction consumed the last available copy first.
+      const stockUpdate = await tx.book.updateMany({
+        where: { id: bookId, deletedAt: null, stockAvailable: { gt: 0 } },
+        data: { stockAvailable: { decrement: 1 } },
+      });
+      if (stockUpdate.count !== 1) {
+        throw new ConflictException('This book is currently out of stock. Please check back later or place a reservation.');
+      }
 
       // Create borrow record
       const record = await tx.borrowRecord.create({
@@ -133,21 +145,26 @@ export class BorrowService {
 
     // 3. Process check-in transaction
     return this.prisma.$transaction(async (tx) => {
-      // Increment available stock
-      await tx.book.update({
-        where: { id: record.bookId },
-        data: {
-          stockAvailable: { increment: 1 },
-        },
-      });
-
-      // Close borrow record
-      const updatedRecord = await tx.borrowRecord.update({
-        where: { id: recordId },
+      // Close only an active record. This protects stock from being incremented
+      // twice when two return requests arrive concurrently.
+      const returnUpdate = await tx.borrowRecord.updateMany({
+        where: { id: recordId, status: 'BORROWED' },
         data: {
           returnDate: new Date(),
           status: 'RETURNED',
         },
+      });
+      if (returnUpdate.count !== 1) {
+        throw new ConflictException('This book copy has already been marked as returned.');
+      }
+
+      await tx.book.update({
+        where: { id: record.bookId },
+        data: { stockAvailable: { increment: 1 } },
+      });
+
+      const updatedRecord = await tx.borrowRecord.findUniqueOrThrow({
+        where: { id: recordId },
       });
 
       // Get Reader Info
@@ -224,15 +241,20 @@ export class BorrowService {
     const newDueDate = new Date(record.dueDate);
     newDueDate.setDate(newDueDate.getDate() + 7);
 
-    const updatedRecord = await this.prisma.borrowRecord.update({
-      where: { id: recordId },
+    const extensionUpdate = await this.prisma.borrowRecord.updateMany({
+      where: { id: recordId, userId, status: 'BORROWED', extendedCount: { lt: 2 } },
       data: {
         dueDate: newDueDate,
         extendedCount: { increment: 1 },
       },
-      include: {
-        book: true,
-      },
+    });
+    if (extensionUpdate.count !== 1) {
+      throw new ConflictException('This loan can no longer be extended. Refresh your loan list and try again.');
+    }
+
+    const updatedRecord = await this.prisma.borrowRecord.findUniqueOrThrow({
+      where: { id: recordId },
+      include: { book: true },
     });
 
     // Get Reader Info
