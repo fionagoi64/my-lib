@@ -8,9 +8,11 @@ import {
   useRules,
   useMarkNotificationRead,
 } from "@library/api";
-import { ThemeToggle, Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@library/ui";
+import { ThemeToggle, Accordion, AccordionItem, AccordionTrigger, AccordionContent, Input } from "@library/ui";
 import { BookOpen, LogIn, Bell, Check, Scale } from "lucide-react";
 import { useTranslation } from "react-i18next";
+
+type ViewerRule = { question: string; answer: string; updatedAt?: string };
 
 function LanguageToggle() {
   const { i18n } = useTranslation();
@@ -44,6 +46,7 @@ export default function StandaloneRulesPage() {
   const [isMounted, setIsMounted] = useState(false);
   const [token, setToken] = useState<string | null>(null);
   const [showBellDropdown, setShowBellDropdown] = useState(false);
+  const [ruleSearch, setRuleSearch] = useState("");
 
   const getConfirmText = (key: string, defaultEn: string, defaultZh: string) => {
     const resolved = t(key);
@@ -91,9 +94,13 @@ export default function StandaloneRulesPage() {
     },
   ];
 
-  const activeRulesList = dbRules && dbRules.length > 0 
-    ? dbRules.map(r => ({ question: r.title, answer: r.content })) 
+  const activeRulesList: ViewerRule[] = dbRules && dbRules.length > 0 
+    ? dbRules.map(r => ({ question: r.title, answer: r.content, updatedAt: r.updatedAt })) 
     : faqRules;
+  const visibleRules = activeRulesList.filter((rule) => {
+    const query = ruleSearch.trim().toLowerCase();
+    return !query || rule.question.toLowerCase().includes(query) || rule.answer.toLowerCase().includes(query);
+  });
 
   if (!isMounted) {
     return (
@@ -265,6 +272,16 @@ export default function StandaloneRulesPage() {
           <p className="text-zinc-500 text-sm mt-1">{t("rules.description")}</p>
         </div>
 
+        <div className="rounded-2xl border border-zinc-900 bg-zinc-900/30 p-3">
+          <Input
+            value={ruleSearch}
+            onChange={(event) => setRuleSearch(event.target.value)}
+            placeholder="Search policies and regulations..."
+            className="border-zinc-800 bg-zinc-950 text-sm text-white placeholder:text-zinc-500"
+          />
+          {ruleSearch && <p className="mt-2 text-xs text-zinc-500">{visibleRules.length} matching rule(s)</p>}
+        </div>
+
         {isRulesLoading ? (
           <div className="py-20 text-center text-zinc-500">
             <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -272,7 +289,7 @@ export default function StandaloneRulesPage() {
           </div>
         ) : (
           <Accordion type="single" collapsible defaultValue="faq-rule-0" className="space-y-4">
-            {activeRulesList.map((faq, index) => (
+            {visibleRules.map((faq, index) => (
               <AccordionItem
                 key={index}
                 value={`faq-rule-${index}`}
@@ -283,9 +300,19 @@ export default function StandaloneRulesPage() {
                 </AccordionTrigger>
                 <AccordionContent className="text-zinc-400 text-xs leading-relaxed">
                   {faq.answer}
+                  {faq.updatedAt && (
+                    <p className="mt-3 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+                      Last updated {new Date(faq.updatedAt).toLocaleDateString()}
+                    </p>
+                  )}
                 </AccordionContent>
               </AccordionItem>
             ))}
+            {visibleRules.length === 0 && (
+              <div className="rounded-2xl border border-dashed border-zinc-800 py-10 text-center text-sm text-zinc-500">
+                No rules match your search.
+              </div>
+            )}
           </Accordion>
         )}
 
