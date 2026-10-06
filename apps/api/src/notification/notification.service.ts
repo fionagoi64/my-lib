@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException, MessageEvent } from '@nestjs/common';
 import { PrismaService } from '@/prisma/prisma.service';
 import { SendNotificationDto } from './dto/send-notification.dto';
+import { NotificationQueryDto } from './dto/notification-query.dto';
 import { Observable, Subject } from 'rxjs';
 
 @Injectable()
@@ -36,16 +37,26 @@ export class NotificationService {
   }
 
   // Get notifications for a specific user
-  async getNotificationsForUser(userId: string) {
+  async getNotificationsForUser(userId: string, query: NotificationQueryDto) {
+    const where = { userId, deletedAt: null, ...(query.unreadOnly === 'true' ? { isRead: false } : {}) };
+    if (query.page !== undefined && query.limit !== undefined) {
+      const [data, total] = await Promise.all([
+        this.prisma.notification.findMany({ where, skip: (query.page - 1) * query.limit, take: query.limit, orderBy: { createdAt: 'desc' } }),
+        this.prisma.notification.count({ where }),
+      ]);
+      return { data, meta: { total, page: query.page, limit: query.limit, totalPages: Math.ceil(total / query.limit) } };
+    }
     return this.prisma.notification.findMany({
-      where: {
-        userId,
-        deletedAt: null,
-      },
+      where,
       orderBy: {
         createdAt: 'desc',
       },
     });
+  }
+
+  async getSummary(userId: string) {
+    const unread = await this.prisma.notification.count({ where: { userId, deletedAt: null, isRead: false } });
+    return { unread };
   }
 
   // Mark a specific notification as read

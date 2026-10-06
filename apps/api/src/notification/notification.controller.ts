@@ -8,14 +8,16 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
   Sse,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { NotificationService } from './notification.service';
 import { SendNotificationDto } from './dto/send-notification.dto';
+import { NotificationQueryDto } from './dto/notification-query.dto';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/auth/guards/roles.guard';
 import { Roles } from '@/auth/decorators/roles.decorator';
@@ -36,9 +38,18 @@ export class NotificationController {
   })
   @ApiResponse({ status: 200, description: 'Notifications retrieved successfully.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  getMyNotifications(@Req() req: any) {
+  @ApiQuery({ name: 'unreadOnly', required: false, description: 'Return unread notifications only' })
+  @ApiQuery({ name: 'page', required: false, description: 'Optional page number (requires limit)' })
+  @ApiQuery({ name: 'limit', required: false, description: 'Optional page size, 1 to 100 (requires page)' })
+  getMyNotifications(@Req() req: any, @Query() query: NotificationQueryDto) {
     const userId = req.user.sub;
-    return this.notificationService.getNotificationsForUser(userId);
+    return this.notificationService.getNotificationsForUser(userId, query);
+  }
+
+  @Get('mine/summary')
+  @ApiOperation({ summary: 'Get unread notification summary for current user' })
+  getMyNotificationSummary(@Req() req: any) {
+    return this.notificationService.getSummary(req.user.sub);
   }
 
   @Sse('stream')
