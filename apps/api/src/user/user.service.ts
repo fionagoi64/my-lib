@@ -89,8 +89,9 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
 
-    // Upsert the user profile row
-    return this.prisma.userProfile.upsert({
+    // Upsert the user profile row, then return the same aggregate shape as
+    // GET /users/profile so clients do not need two response contracts.
+    await this.prisma.userProfile.upsert({
       where: { userId },
       update: {
         phone: updateProfileDto.phone,
@@ -106,6 +107,8 @@ export class UserService {
         bio: updateProfileDto.bio,
       },
     });
+
+    return this.getProfile(userId);
   }
 
   async updateRole(userId: string, roleName: string) {
