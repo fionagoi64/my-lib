@@ -15,6 +15,7 @@ export default function AdminLoansPage() {
   const [loanSearch, setLoanSearch] = useState("");
   const [loanPage, setLoanPage] = useState(1);
   const [loanPageSize, setLoanPageSize] = useState(10);
+  const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
   useEffect(() => {
     setLoanPage(1);
@@ -26,11 +27,11 @@ export default function AdminLoansPage() {
   const handleAdminReturn = (loanId: number) => {
     returnBookMutation.mutate(loanId, {
       onSuccess: () => {
-        alert("Book successfully checked-in!");
+        setFeedback({ type: "success", message: "Book checked in successfully." });
         refetchLoans();
       },
       onError: (err: any) => {
-        alert(err.response?.data?.message || "Failed to process check-in.");
+        setFeedback({ type: "error", message: err.response?.data?.message || "Failed to process check-in." });
       },
     });
   };
@@ -53,6 +54,8 @@ export default function AdminLoansPage() {
         <h3 className="text-xl font-extrabold text-white tracking-tight">System Loan Ledger</h3>
         <p className="text-zinc-500 text-xs">Full auditing report of all user books checked-out or returned globally.</p>
       </div>
+
+      {feedback && <div role={feedback.type === "error" ? "alert" : "status"} className={`rounded-xl border px-4 py-3 text-sm ${feedback.type === "error" ? "border-red-500/30 bg-red-500/10 text-red-300" : "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"}`}>{feedback.message}</div>}
 
       {/* Sleek Search Bar */}
       <div className="w-full max-w-md bg-zinc-900/40 border border-zinc-900 rounded-2xl px-4 py-3 flex items-center gap-3">
@@ -127,9 +130,10 @@ export default function AdminLoansPage() {
                         {loan.status === "BORROWED" && (
                           <button
                             onClick={() => handleAdminReturn(loan.id)}
+                            disabled={returnBookMutation.isPending}
                             className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold cursor-pointer border-none outline-none"
                           >
-                            Check In
+                            {returnBookMutation.isPending ? "Checking in…" : "Check In"}
                           </button>
                         )}
                         {loan.status === "RETURNED" && (
