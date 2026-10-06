@@ -16,6 +16,7 @@ import { BooksService } from '@/books/books.service';
 import { CreateCategoryDto } from '@/books/dto/create-category.dto';
 import { CreateBookDto } from '@/books/dto/create-book.dto';
 import { UpdateBookDto } from '@/books/dto/update-book.dto';
+import { BookQueryDto } from '@/books/dto/book-query.dto';
 
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/auth/guards/roles.guard';
@@ -98,21 +99,14 @@ export class BooksController {
     summary: 'Browse book catalog',
     description: 'Retrieves all available books with optional keyword searches, category filtering, and pagination.',
   })
-  @ApiQuery({ name: 'search', required: false, description: 'Keyword query matching title or author' })
+  @ApiQuery({ name: 'search', required: false, description: 'Keyword query matching title, author, or ISBN' })
   @ApiQuery({ name: 'categoryId', required: false, description: 'Category identifier filter' })
+  @ApiQuery({ name: 'availableOnly', required: false, description: 'When true, return books with available copies only' })
   @ApiQuery({ name: 'page', required: false, description: 'Page number for pagination' })
   @ApiQuery({ name: 'limit', required: false, description: 'Number of items per page' })
   @ApiResponse({ status: 200, description: 'Catalog items returned successfully.' })
-  findAllBooks(
-    @Query('search') search?: string,
-    @Query('categoryId') categoryId?: string,
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
-  ) {
-    const catId = categoryId ? parseInt(categoryId, 10) : undefined;
-    const pageNum = page ? parseInt(page, 10) : undefined;
-    const limitNum = limit ? parseInt(limit, 10) : undefined;
-    return this.booksService.findAllBooks(search, catId, pageNum, limitNum);
+  findAllBooks(@Query() query: BookQueryDto) {
+    return this.booksService.findAllBooks(query);
   }
 
   @Get(':id')

@@ -8,6 +8,7 @@ import { PrismaService } from '@/prisma/prisma.service';
 import { CreateCategoryDto } from '@/books/dto/create-category.dto';
 import { CreateBookDto } from '@/books/dto/create-book.dto';
 import { UpdateBookDto } from '@/books/dto/update-book.dto';
+import { BookQueryDto } from '@/books/dto/book-query.dto';
 
 @Injectable()
 export class BooksService {
@@ -104,19 +105,25 @@ export class BooksService {
     });
   }
 
-  async findAllBooks(search?: string, categoryId?: number, page?: number, limit?: number) {
+  async findAllBooks(query: BookQueryDto) {
+    const { search, categoryId, page, limit, availableOnly } = query;
     const whereClause: any = {
       deletedAt: null,
     };
 
-    if (categoryId) {
+    if (categoryId !== undefined) {
       whereClause.categoryId = categoryId;
+    }
+
+    if (availableOnly === 'true') {
+      whereClause.stockAvailable = { gt: 0 };
     }
 
     if (search) {
       whereClause.OR = [
         { title: { contains: search, mode: 'insensitive' } },
         { author: { contains: search, mode: 'insensitive' } },
+        { isbn: { contains: search, mode: 'insensitive' } },
       ];
     }
 

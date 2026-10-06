@@ -94,13 +94,14 @@ export const useDeleteCategory = () => {
 // BOOKS HOOKS
 // ==========================================
 
-export const useBooks = (params?: { search?: string; categoryId?: number; page?: number; limit?: number }) => {
+export const useBooks = (params?: { search?: string; categoryId?: number; availableOnly?: boolean; page?: number; limit?: number }) => {
   return useQuery<any>({
-    queryKey: ['books', params?.search, params?.categoryId, params?.page, params?.limit],
+    queryKey: ['books', params?.search, params?.categoryId, params?.availableOnly, params?.page, params?.limit],
     queryFn: async () => {
       const queryParams: any = {};
       if (params?.search) queryParams.search = params.search;
       if (params?.categoryId) queryParams.categoryId = params.categoryId;
+      if (params?.availableOnly !== undefined) queryParams.availableOnly = params.availableOnly;
       if (params?.page !== undefined) queryParams.page = params.page;
       if (params?.limit !== undefined) queryParams.limit = params.limit;
 
