@@ -66,7 +66,7 @@ export class AuthService {
       },
     });
 
-    if (!user) {
+    if (!user || !user.isActive) {
       throw new UnauthorizedException('Invalid email or password');
     }
 
