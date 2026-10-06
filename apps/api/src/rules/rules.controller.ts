@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -63,12 +64,12 @@ export class RulesController {
   @ApiResponse({ status: 200, description: 'Rule updated successfully.' })
   @ApiResponse({ status: 404, description: 'Rule not found.' })
   update(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Req() req: any,
     @Body() updateRuleDto: CreateRuleDto,
   ) {
     const userId = req.user.sub;
-    return this.rulesService.update(Number(id), userId, updateRuleDto);
+    return this.rulesService.update(id, userId, updateRuleDto);
   }
 
   @Delete(':id')
@@ -81,7 +82,7 @@ export class RulesController {
   })
   @ApiResponse({ status: 200, description: 'Rule removed successfully.' })
   @ApiResponse({ status: 404, description: 'Rule not found.' })
-  remove(@Param('id') id: string) {
-    return this.rulesService.remove(Number(id));
+  remove(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
+    return this.rulesService.remove(id, req.user.sub);
   }
 }

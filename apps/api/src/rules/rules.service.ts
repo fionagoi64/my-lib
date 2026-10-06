@@ -107,7 +107,7 @@ export class RulesService {
     return updated;
   }
 
-  async remove(id: number) {
+  async remove(id: number, userId: string) {
     const rule = await this.prisma.libraryRule.findUnique({
       where: { id },
     });
@@ -120,6 +120,7 @@ export class RulesService {
       where: { id },
       data: {
         deletedAt: new Date(),
+        updatedBy: userId,
       },
     });
   }
