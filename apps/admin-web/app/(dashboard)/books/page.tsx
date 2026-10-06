@@ -54,6 +54,7 @@ export default function AdminBooksPage() {
   const [bookSearch, setBookSearch] = useState("");
   const [bookPage, setBookPage] = useState(1);
   const [bookPageSize, setBookPageSize] = useState(10);
+  const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
   useEffect(() => {
     setBookPage(1);
@@ -109,18 +110,21 @@ export default function AdminBooksPage() {
   const handleDeleteBook = (id: number) => {
     deleteBookMutation.mutate(id, {
       onSuccess: () => {
-        alert("Book removed from active catalog.");
+        setFeedback({ type: "success", message: "Book removed from the active catalogue." });
         refetchBooks();
       },
       onError: (err: any) => {
-        alert(err.response?.data?.message || "Could not delete book copy.");
+        setFeedback({ type: "error", message: err.response?.data?.message || "Could not delete this book." });
       },
     });
   };
 
   const handleSaveBook = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!bookCategoryId) return alert("Please select a category");
+    if (!bookCategoryId) {
+      setFeedback({ type: "error", message: "Please select a category." });
+      return;
+    }
 
     const payload = {
       title: bookTitle,
@@ -136,12 +140,12 @@ export default function AdminBooksPage() {
         { id: editingBookId, payload },
         {
           onSuccess: () => {
-            alert("Book specifications updated successfully!");
+            setFeedback({ type: "success", message: "Book details updated successfully." });
             resetBookForm();
             refetchBooks();
           },
           onError: (err: any) => {
-            alert(err.response?.data?.message || "Error updating book specifications.");
+            setFeedback({ type: "error", message: err.response?.data?.message || "Could not update book details." });
           },
         }
       );
@@ -150,7 +154,7 @@ export default function AdminBooksPage() {
         payload,
         {
           onSuccess: () => {
-            alert("Book cataloged successfully!");
+            setFeedback({ type: "success", message: "Book added to the catalogue." });
             
             // Dispatch system-wide notification of new book arrival
             sendNotificationMutation.mutate({
@@ -167,7 +171,7 @@ export default function AdminBooksPage() {
             refetchBooks();
           },
           onError: (err: any) => {
-            alert(err.response?.data?.message || "Error adding book.");
+            setFeedback({ type: "error", message: err.response?.data?.message || "Could not add this book." });
           },
         }
       );
@@ -205,6 +209,12 @@ export default function AdminBooksPage() {
           {showAddBook ? "Close Panel" : "Catalog New Book"}
         </button>
       </div>
+
+      {feedback && (
+        <div role={feedback.type === "error" ? "alert" : "status"} className={`rounded-xl border px-4 py-3 text-sm ${feedback.type === "error" ? "border-red-500/30 bg-red-500/10 text-red-300" : "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"}`}>
+          {feedback.message}
+        </div>
+      )}
 
       {/* Add / Edit Book Form Panel */}
       {showAddBook && (
