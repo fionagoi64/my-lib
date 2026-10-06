@@ -25,12 +25,16 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Create a new user',
-    description: 'Registers a new user in the library system.',
+    description: 'Registers a new reader account. Requires Admin role.',
   })
   @ApiResponse({ status: 201, description: 'User created successfully.' })
   @ApiResponse({ status: 400, description: 'Invalid input.' })
+  @ApiResponse({ status: 403, description: 'Forbidden. Admin role required.' })
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }
