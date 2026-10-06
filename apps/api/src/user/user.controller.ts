@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Query,
   Patch,
   Param,
   Post,
@@ -14,6 +15,7 @@ import { UserService } from '@/user/user.service';
 import { CreateUserDto } from '@/user/dto/create-user.dto';
 import { UpdateProfileDto } from '@/user/dto/update-profile.dto';
 import { UpdateRoleDto } from '@/user/dto/update-role.dto';
+import { UserQueryDto } from '@/user/dto/user-query.dto';
 
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/auth/guards/roles.guard';
@@ -50,8 +52,8 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'List of users returned successfully.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   @ApiResponse({ status: 403, description: 'Forbidden. Admin role required.' })
-  findAll() {
-    return this.userService.findAll();
+  findAll(@Query() query: UserQueryDto) {
+    return this.userService.findAll(query);
   }
 
   @Get('profile')

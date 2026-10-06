@@ -4,6 +4,7 @@ import * as bcrypt from 'bcrypt';
 import { PrismaService } from '@/prisma/prisma.service';
 import { CreateUserDto } from '@/user/dto/create-user.dto';
 import { UpdateProfileDto } from '@/user/dto/update-profile.dto';
+import { UserQueryDto } from '@/user/dto/user-query.dto';
 
 @Injectable()
 export class UserService {
@@ -45,21 +46,39 @@ export class UserService {
     });
   }
 
-  async findAll() {
+  async findAll(query: UserQueryDto = {}) {
+    const where: any = {};
+    if (query.q) {
+      where.OR = [
+        { email: { contains: query.q, mode: 'insensitive' } },
+        { firstName: { contains: query.q, mode: 'insensitive' } },
+        { lastName: { contains: query.q, mode: 'insensitive' } },
+        { role: { name: { contains: query.q, mode: 'insensitive' } } },
+      ];
+    }
+
+    const select = {
+      id: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+      isActive: true,
+      role: { select: { name: true } },
+      createdAt: true,
+    };
+
+    if (query.page !== undefined && query.limit !== undefined) {
+      const [data, total] = await Promise.all([
+        this.prisma.user.findMany({ where, select, orderBy: { createdAt: 'desc' }, skip: (query.page - 1) * query.limit, take: query.limit }),
+        this.prisma.user.count({ where }),
+      ]);
+      return { data, meta: { total, page: query.page, limit: query.limit, totalPages: Math.ceil(total / query.limit) } };
+    }
+
     return this.prisma.user.findMany({
+      where,
       orderBy: { createdAt: 'desc' },
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        role: {
-          select: {
-            name: true,
-          },
-        },
-        createdAt: true,
-      }
+      select,
     });
   }
 
