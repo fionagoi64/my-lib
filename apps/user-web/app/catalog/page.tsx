@@ -12,6 +12,7 @@ import {
   useExtendLoan,
   useMyLoans,
   useMyNotifications,
+  useOpenLibrarySearch,
 } from "@library/api";
 import {
   ThemeToggle,
@@ -175,6 +176,7 @@ export default function StandaloneCatalog() {
   const { data: categories } = useCategories();
   const { data: bookDetails, isLoading: isBookDetailsLoading } = useBook(selectedBookId || 0);
   const { data: notifications } = useMyNotifications();
+  const { data: openLibraryResults, isFetching: isOpenLibrarySearching } = useOpenLibrarySearch(searchQuery);
 
   const unreadNotifications = notifications?.filter((n) => !n.isRead) || [];
   const unreadCount = unreadNotifications.length;
@@ -597,6 +599,40 @@ export default function StandaloneCatalog() {
                   </div>
                 </div>
               </div>
+
+              {searchQuery.trim().length >= 3 && (
+                <section className="rounded-3xl border border-indigo-500/20 bg-indigo-500/5 p-5 text-left">
+                  <div className="mb-4 flex items-start justify-between gap-4">
+                    <div>
+                      <h4 className="text-sm font-extrabold text-white">Discover more titles</h4>
+                      <p className="mt-1 text-xs text-zinc-400">Open Library results are public book metadata, not books currently in this library.</p>
+                    </div>
+                    {isOpenLibrarySearching && <span className="text-xs font-semibold text-indigo-300">Searching…</span>}
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    {openLibraryResults?.results.map((book) => (
+                      <a
+                        key={book.workId}
+                        href={`https://openlibrary.org${book.workId}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="group rounded-2xl border border-zinc-800 bg-zinc-950/70 p-3 no-underline transition-colors hover:border-indigo-400/50"
+                      >
+                        <div className="flex gap-3">
+                          <div className="h-16 w-11 shrink-0 overflow-hidden rounded-lg bg-zinc-900">
+                            {book.coverUrl ? <img src={book.coverUrl} alt="" className="h-full w-full object-cover" /> : null}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="truncate text-xs font-extrabold text-white group-hover:text-indigo-300">{book.title}</p>
+                            <p className="mt-1 line-clamp-2 text-[11px] text-zinc-400">{book.authors.join(", ") || "Unknown author"}</p>
+                            {book.firstPublishedYear && <p className="mt-1 text-[10px] text-zinc-500">First published {book.firstPublishedYear}</p>}
+                          </div>
+                        </div>
+                      </a>
+                    ))}
+                  </div>
+                </section>
+              )}
 
               {/* Category Filters */}
               <div className="flex flex-wrap gap-2 items-center justify-start">
