@@ -116,8 +116,8 @@ export default function ReaderForgotPasswordPage() {
       setForgotStep(2);
       setForgotSuccess(
         i18n.language === "zh"
-          ? "重置验证码已发送至您的邮箱！请在下方输入验证码（可输入测试码 123456）及新密码。"
-          : "Verification code sent to your email! Please enter it below with your new password (you can use test code 123456)."
+          ? "如该邮箱已注册，验证码将发送至邮箱。请在下方输入验证码及新密码。"
+          : "If an account exists for this address, a verification code will be sent. Enter the code and your new password below."
       );
     }, 1200);
   };
@@ -134,9 +134,9 @@ export default function ReaderForgotPasswordPage() {
       return;
     }
 
-    if (forgotCode.trim() !== "123456") {
+    if (!/^\d{6}$/.test(forgotCode.trim())) {
       setForgotError(
-        i18n.language === "zh" ? "重置验证码无效！请输入正确的测试码 123456。" : "Invalid code! Please use the correct test code 123456."
+        i18n.language === "zh" ? "请输入 6 位数字验证码。" : "Enter the 6-digit verification code."
       );
       return;
     }
@@ -194,7 +194,7 @@ export default function ReaderForgotPasswordPage() {
         </div>
 
         {forgotError && (
-          <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-medium text-center">
+          <div role="alert" className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-medium text-center">
             ⚠️ {forgotError}
           </div>
         )}
@@ -214,6 +214,7 @@ export default function ReaderForgotPasswordPage() {
               <input
                 type="email"
                 required
+                autoComplete="email"
                 placeholder="reader@library.com"
                 value={forgotEmail}
                 onChange={(e) => setForgotEmail(e.target.value)}
@@ -235,12 +236,16 @@ export default function ReaderForgotPasswordPage() {
           <form onSubmit={handleResetSubmit} className="space-y-4">
             <div>
               <label className="block text-zinc-400 text-xs font-semibold mb-1.5 uppercase tracking-wide text-left">
-                {getConfirmText("forgot.codeLabel", "Verification Code (Use 123456)", "重置验证码 (请输入 123456)")}
+                {getConfirmText("forgot.codeLabel", "6-digit Verification Code", "6 位重置验证码")}
               </label>
               <input
                 type="text"
                 required
-                placeholder="e.g. 123456"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                pattern="[0-9]{6}"
+                maxLength={6}
+                placeholder="123456"
                 value={forgotCode}
                 onChange={(e) => setForgotCode(e.target.value)}
                 className="w-full bg-zinc-955 border border-zinc-855 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-xl px-4 py-3 text-sm outline-none transition-all text-white font-mono tracking-widest text-center"
@@ -254,6 +259,8 @@ export default function ReaderForgotPasswordPage() {
                 <input
                   type={showPassword ? "text" : "password"}
                   required
+                  minLength={8}
+                  autoComplete="new-password"
                   placeholder="••••••••"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
@@ -276,6 +283,8 @@ export default function ReaderForgotPasswordPage() {
                 <input
                   type={showConfirmPassword ? "text" : "password"}
                   required
+                  minLength={8}
+                  autoComplete="new-password"
                   placeholder="••••••••"
                   value={confirmNewPassword}
                   onChange={(e) => setConfirmNewPassword(e.target.value)}
