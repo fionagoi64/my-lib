@@ -39,10 +39,10 @@ export default function AdminUsersPage() {
 
     createUserMutation.mutate(
       {
-        email: userEmail,
+        email: userEmail.trim().toLowerCase(),
         password: userPassword,
-        firstName: userFirstName,
-        lastName: userLastName,
+        firstName: userFirstName.trim(),
+        lastName: userLastName.trim(),
       },
       {
         onSuccess: () => {
@@ -90,13 +90,13 @@ export default function AdminUsersPage() {
           </div>
 
           {userCreateSuccess && (
-            <div className="p-3 bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-semibold rounded-xl text-center">
+            <div role="status" className="p-3 bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-semibold rounded-xl text-center">
               ✨ {userCreateSuccess}
             </div>
           )}
 
           {userCreateError && (
-            <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold rounded-xl text-center">
+            <div role="alert" className="p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold rounded-xl text-center">
               ⚠️ {userCreateError}
             </div>
           )}
@@ -130,6 +130,7 @@ export default function AdminUsersPage() {
               <input
                 type="email"
                 required
+                autoComplete="email"
                 placeholder="fiona@gmail.com"
                 value={userEmail}
                 onChange={(e) => setUserEmail(e.target.value)}
@@ -142,6 +143,8 @@ export default function AdminUsersPage() {
                 <input
                   type={showUserPassword ? "text" : "password"}
                   required
+                  minLength={6}
+                  autoComplete="new-password"
                   placeholder="••••••••"
                   value={userPassword}
                   onChange={(e) => setUserPassword(e.target.value)}
@@ -160,9 +163,10 @@ export default function AdminUsersPage() {
             
             <button
               type="submit"
+              disabled={createUserMutation.isPending}
               className="w-full py-2.5 bg-red-600 hover:bg-red-700 active:scale-95 transition-all text-white font-bold rounded-xl text-xs cursor-pointer border-none outline-none"
             >
-              Register Account
+              {createUserMutation.isPending ? "Registering…" : "Register Account"}
             </button>
           </form>
         </div>
