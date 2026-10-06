@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import {
   useAllLoans,
-  useReturnBook,
+  useCheckInBook,
 } from "@library/api";
 import { SharedPagination } from "@library/ui";
 import { useTranslation } from "react-i18next";
@@ -22,7 +22,7 @@ export default function AdminLoansPage() {
   }, [loanSearch]);
 
   const { data: allLoans, refetch: refetchLoans } = useAllLoans();
-  const returnBookMutation = useReturnBook();
+  const returnBookMutation = useCheckInBook();
 
   const handleAdminReturn = (loanId: number) => {
     returnBookMutation.mutate(loanId, {

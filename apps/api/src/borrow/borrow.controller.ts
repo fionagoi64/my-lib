@@ -54,6 +54,21 @@ export class BorrowController {
     return this.borrowService.returnBook(userId, recordId, isAdmin);
   }
 
+  @Post('check-in/:id')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(RolesGuard)
+  @Roles('ADMIN', 'LIBRARIAN')
+  @ApiOperation({
+    summary: 'Check in a loan as library staff',
+    description: 'Staff-only return operation for any active loan. The operation is idempotency-safe and restores one available copy.',
+  })
+  @ApiResponse({ status: 200, description: 'Book checked in successfully.' })
+  @ApiResponse({ status: 403, description: 'Forbidden. Admin or Librarian role required.' })
+  @ApiResponse({ status: 409, description: 'Loan was already checked in.' })
+  checkInBook(@Req() req: any, @Param('id', ParseIntPipe) recordId: number) {
+    return this.borrowService.returnBook(req.user.sub, recordId, true);
+  }
+
   @Post('extend/:id')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({

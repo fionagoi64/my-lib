@@ -55,6 +55,21 @@ export const useReturnBook = () => {
   });
 };
 
+export const useCheckInBook = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (recordId: number) => {
+      const response = await serverApi.post(`/borrow/check-in/${recordId}`);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['books'] });
+      queryClient.invalidateQueries({ queryKey: ['all-loans'] });
+    },
+  });
+};
+
 export const useExtendLoan = () => {
   const queryClient = useQueryClient();
 
