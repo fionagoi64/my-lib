@@ -1,0 +1,162 @@
+@import "tailwindcss";
+
+/* ----------------------------------------------------
+   CSS VARIABLE THEME DEFINITIONS
+   Default: System theme matches system configuration.
+   Overrides: Explicit .light or .dark classes.
+   ---------------------------------------------------- */
+
+:root {
+  /* Default Light Theme Values */
+  --zinc-950: #f9fafb; /* Main background color */
+  --zinc-900: #ffffff; /* Card/Sidebar/Dialog backgrounds */
+  --zinc-850: #f3f4f6; /* Inputs, sub-panels, intermediate backgrounds */
+  --zinc-800: #e5e7eb; /* Primary border lines */
+  --zinc-700: #d1d5db; /* Accent border lines, disabled controls */
+  --zinc-600: #9ca3af; /* Sub-borders, inactive items */
+  --zinc-500: #6b7280; /* Tertiary text, disabled text labels */
+  --zinc-400: #4b5563; /* Secondary text, metadata details */
+  --zinc-300: #374151; /* Body text, labels */
+  --zinc-200: #1f2937; /* Sub-headings, active items */
+  --zinc-100: #111827; /* Main title text, primary headers */
+  --white-custom: #111827; /* Standard text-white transitions to dark text in light mode */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Dark Theme System Fallback */
+    --zinc-950: #09090b;
+    --zinc-900: #18181b;
+    --zinc-850: #202024;
+    --zinc-800: #27272a;
+    --zinc-700: #3f3f46;
+    --zinc-600: #52525b;
+    --zinc-500: #71717a;
+    --zinc-400: #a1a1aa;
+    --zinc-300: #d4d4d8;
+    --zinc-200: #e4e4e7;
+    --zinc-100: #f4f4f5;
+    --white-custom: #ffffff;
+  }
+}
+
+/* Explicit class selectors for manually selected light or dark overrides */
+.light {
+  --zinc-950: #f9fafb;
+  --zinc-900: #ffffff;
+  --zinc-850: #f3f4f6;
+  --zinc-800: #e5e7eb;
+  --zinc-700: #d1d5db;
+  --zinc-600: #9ca3af;
+  --zinc-500: #6b7280;
+  --zinc-400: #4b5563;
+  --zinc-300: #374151;
+  --zinc-200: #1f2937;
+  --zinc-100: #111827;
+  --white-custom: #111827;
+}
+
+.dark {
+  --zinc-950: #09090b;
+  --zinc-900: #18181b;
+  --zinc-850: #202024;
+  --zinc-800: #27272a;
+  --zinc-700: #3f3f46;
+  --zinc-600: #52525b;
+  --zinc-500: #71717a;
+  --zinc-400: #a1a1aa;
+  --zinc-300: #d4d4d8;
+  --zinc-200: #e4e4e7;
+  --zinc-100: #f4f4f5;
+  --white-custom: #ffffff;
+}
+
+/* ----------------------------------------------------
+   TAILWIND CSS V4 THEME EXTENSIONS
+   Overriding native colors to leverage dynamic variables.
+   ---------------------------------------------------- */
+@theme {
+  --color-zinc-950: var(--zinc-950);
+  --color-zinc-900: var(--zinc-900);
+  --color-zinc-850: var(--zinc-850);
+  --color-zinc-800: var(--zinc-800);
+  --color-zinc-700: var(--zinc-700);
+  --color-zinc-600: var(--zinc-600);
+  --color-zinc-500: var(--zinc-500);
+  --color-zinc-400: var(--zinc-400);
+  --color-zinc-300: var(--zinc-300);
+  --color-zinc-200: var(--zinc-200);
+  --color-zinc-100: var(--zinc-100);
+  --color-white: var(--white-custom);
+  
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  --animate-fade-in: fade-in 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-fade-out: fade-out 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-zoom-in: zoom-in 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-zoom-out: zoom-out 200ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes fade-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+  @keyframes zoom-in {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -48%) scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+  @keyframes zoom-out {
+    from {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: translate(-50%, -48%) scale(0.96);
+    }
+  }
+}
+
+/* ----------------------------------------------------
+   GLOBAL BASE STYLING
+   ---------------------------------------------------- */
+body {
+  background: var(--zinc-950);
+  color: var(--zinc-300);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ----------------------------------------------------
+   MICRO-ANIMATION TRANSITIONS
+   Ensures theme changes transition with butter-smooth animation.
+   ---------------------------------------------------- */
+body, div, nav, aside, main, header, footer, button, input, textarea, select, span, h1, h2, h3, h4, h5, h6, table, tr, th, td {
+  transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ----------------------------------------------------
+   CONTRAST & ACCESSIBILITY FIXES FOR LIGHT MODE
+   Ensures text inside colored buttons, badges, and notification targets
+   retains white-text contrast when system/theme is light.
+   ---------------------------------------------------- */
+.bg-red-600, .bg-blue-600, .bg-red-500, .bg-blue-500, .bg-emerald-600, .bg-amber-600, .bg-amber-500, .bg-green-600, .bg-indigo-600, .bg-indigo-500, .bg-red-700, .bg-blue-700 {
+  color: #ffffff !important;
+}
+
+.bg-red-600 *, .bg-blue-600 *, .bg-red-500 *, .bg-blue-500 *, .bg-emerald-600 *, .bg-amber-600 *, .bg-amber-500 *, .bg-green-600 *, .bg-indigo-600 *, .bg-indigo-500 *, .bg-red-700 *, .bg-blue-700 * {
+  color: #ffffff !important;
+}
+
+button[type="submit"], button.bg-red-600, button.bg-blue-600, a.bg-red-600, a.bg-blue-600 {
+  color: #ffffff !important;
+}

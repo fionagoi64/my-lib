@@ -1,0 +1,37 @@
+{
+  "name": "library-system",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "pnpm@10.0.0",
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "admin": "pnpm --filter admin-web dev",
+    "user": "pnpm --filter user-web dev",
+    "api": "pnpm --filter api start:dev",
+    "build": "turbo run build",
+    "start": "turbo run start",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "format": "prettier --write .",
+    "db:generate": "pnpm --filter api exec prisma generate",
+    "db:migrate:local": "NODE_ENV=local pnpm --filter api exec prisma migrate dev",
+    "db:migrate:dev": "NODE_ENV=dev pnpm --filter api exec prisma migrate dev",
+    "db:migrate:qa": "NODE_ENV=qa pnpm --filter api exec prisma migrate dev",
+    "db:migrate:prod": "NODE_ENV=prod pnpm --filter api exec prisma migrate deploy",
+    "db:studio": "pnpm --filter api exec prisma studio",
+    "docker:local": "docker compose --env-file .env.local up -d",
+    "docker:dev": "docker compose --env-file .env.dev up -d",
+    "docker:qa": "docker compose --env-file .env.qa up -d",
+    "docker:prod": "docker compose --env-file .env.prod up -d",
+    "docker:down": "docker compose down"
+  },
+  "devDependencies": {
+    "@types/node": "^24.6.0",
+    "dotenv": "^16.6.1",
+    "eslint": "^9.36.0",
+    "prettier": "^3.6.2",
+    "turbo": "^2.5.3",
+    "typescript": "^5.9.3"
+  }
+}

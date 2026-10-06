@@ -1,0 +1,117 @@
+{
+  "common": {
+    "librarySystem": "图书管理系统",
+    "readerDashboard": "读者控制面板",
+    "logOut": "退出登录"
+  },
+  "confirm": {
+    "title": "您确定吗？",
+    "cancel": "取消",
+    "logoutTitle": "确认退出登录",
+    "logoutDescription": "您确定要退出登录吗？您需要重新登录才能访问您的读者控制面板。",
+    "logoutAction": "退出登录",
+    "deleteNotificationTitle": "删除通知",
+    "deleteNotificationDescription": "您确定要删除此条通知吗？此操作无法撤销。",
+    "deleteNotificationAction": "删除"
+  },
+  "landing": {
+    "badge": "在线图书阅览系统",
+    "title": "通往您的",
+    "titleAccent": "无限知识之门",
+    "description": "无缝浏览数千本图书、管理个人借阅记录、申请图书出库并延长借阅期限。",
+    "stats": {
+      "catalogBooks": "馆藏图书",
+      "readerRating": "读者评分",
+      "returnRate": "按时归还率"
+    },
+    "cardTitle": "登录您的读者账户",
+    "cardSub": "读者账户由图书馆工作人员专门开设和配置。",
+    "emailLabel": "电子邮箱",
+    "emailPlaceholder": "fiona@gmail.com",
+    "passwordLabel": "密码",
+    "passwordPlaceholder": "••••••••",
+    "logIn": "登录",
+    "signingIn": "登录中...",
+    "invalidCredentials": "邮箱或密码错误"
+  },
+  "nav": {
+    "browseCatalog": "浏览图书",
+    "myLoans": "我的借阅",
+    "active": "进行中",
+    "myProfile": "个人信息",
+    "libraryRules": "借阅规则",
+    "notifications": "系统通知"
+  },
+  "catalog": {
+    "exploreBooks": "探索馆藏图书",
+    "exploreBooksSub": "查找书籍、检查库存并快速申请借阅。",
+    "searchPlaceholder": "按书名或作者搜索...",
+    "allCategories": "所有类别",
+    "inStock": "有货",
+    "outOfStock": "无货",
+    "viewDetails": "查看详情",
+    "borrow": "借阅",
+    "available": "可用",
+    "totalStock": "总库存",
+    "copies": "册",
+    "backToCatalog": "返回目录",
+    "genre": "流派分类",
+    "isbn": "ISBN 编号",
+    "acquisitionCode": "入藏编码",
+    "bookOverview": "图书简介",
+    "noSynopsis": "暂无图书简介。适用标准图书馆借阅条款。",
+    "readyToBorrow": "准备申请借阅此书？",
+    "readyToBorrowSub": "将适用最长初始借阅期限及标准借阅规则。",
+    "borrowCopy": "借阅此书",
+    "loading": "正在加载图书目录...",
+    "noBooks": "没有找到符合搜索条件的图书。请尝试调整关键字！"
+  },
+  "notificationsPanel": {
+    "title": "系统通知",
+    "markAllRead": "全部标记为已读",
+    "noNotifications": "暂无通知。",
+    "viewAll": "查看全部通知"
+  },
+  "loans": {
+    "title": "活动中的图书借阅",
+    "description": "跟踪您的图书借阅记录、到期归还日期，并可申请延长借阅期限。",
+    "loading": "正在加载借阅记录...",
+    "noLoans": "您目前没有任何活动中的借阅记录。请浏览图书目录借阅图书！",
+    "loanId": "借阅编号",
+    "borrowDate": "借阅日期",
+    "dueDate": "应还日期",
+    "overdue": "已逾期",
+    "extend": "续借",
+    "returnBook": "归还图书",
+    "returnedOn": "归还于",
+    "activeStatus": "已借阅"
+  },
+  "profile": {
+    "title": "个人借阅档案详情",
+    "description": "自定义您的个人信息名片和系统的联系信息详情。",
+    "success": "✨ 个人档案更新成功！",
+    "saving": "正在保存个人信息...",
+    "save": "保存借阅档案详情",
+    "phone": "电话号码",
+    "avatarUrl": "头像链接",
+    "address": "居住地址",
+    "bio": "个人简介",
+    "memberId": "会员编号"
+  },
+  "rules": {
+    "title": "图书馆借阅管理规范问答",
+    "description": "点击任意指南类别，查看具体的借阅标准、政策及详细规定。",
+    "loading": "正在加载规章制度...",
+    "bannerTitle": "需要其他协助吗？",
+    "bannerText": "如果您对特藏档案、仅限阅览的手稿或逾期滞纳金减免有任何疑问，请直接前往前台咨询馆员或发送电子邮件至 support@library.com。"
+  },
+  "notificationsPage": {
+    "title": "系统通知收件箱",
+    "description": "及时获取您的借阅状态变更、图书馆催还提醒以及借阅规则更新。",
+    "markAllRead": "全部标记为已读",
+    "clearTitle": "您的收件箱很干净",
+    "clearText": "您目前没有任何新 alerts、还书提醒或来自图书馆馆员的规则更新通知。",
+    "delete": "删除通知",
+    "markAsRead": "标记为已读"
+  }
+}

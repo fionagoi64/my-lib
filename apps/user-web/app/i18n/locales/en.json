@@ -1,0 +1,117 @@
+{
+  "common": {
+    "librarySystem": "Library System",
+    "readerDashboard": "Reader Dashboard",
+    "logOut": "Log Out"
+  },
+  "confirm": {
+    "title": "Are you sure?",
+    "cancel": "Cancel",
+    "logoutTitle": "Confirm Logout",
+    "logoutDescription": "Are you sure you want to log out? You will need to sign in again to access your reader dashboard.",
+    "logoutAction": "Log Out",
+    "deleteNotificationTitle": "Delete Notification",
+    "deleteNotificationDescription": "Are you sure you want to delete this notification? This action cannot be undone.",
+    "deleteNotificationAction": "Delete"
+  },
+  "landing": {
+    "badge": "Online Library Reader System",
+    "title": "Your Gateway to",
+    "titleAccent": "Infinite Knowledge",
+    "description": "Browse thousands of library titles, manage your personal reading loans, request check-outs, and extend borrowing durations seamlessly.",
+    "stats": {
+      "catalogBooks": "Catalog Books",
+      "readerRating": "Reader Rating",
+      "returnRate": "Return Rate"
+    },
+    "cardTitle": "Sign In to Your Reader Account",
+    "cardSub": "Reader accounts are set up exclusively by library staff.",
+    "emailLabel": "Email Address",
+    "emailPlaceholder": "fiona@gmail.com",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "••••••••",
+    "logIn": "Log In",
+    "signingIn": "Signing In...",
+    "invalidCredentials": "Invalid email or password"
+  },
+  "nav": {
+    "browseCatalog": "Browse Catalog",
+    "myLoans": "My Loans",
+    "active": "Active",
+    "myProfile": "My Profile",
+    "libraryRules": "Library Rules",
+    "notifications": "Notifications"
+  },
+  "catalog": {
+    "exploreBooks": "Explore Books",
+    "exploreBooksSub": "Find titles, check stock levels, and request borrowing.",
+    "searchPlaceholder": "Search by title or author...",
+    "allCategories": "All Categories",
+    "inStock": "In Stock",
+    "outOfStock": "Out of Stock",
+    "viewDetails": "View Details",
+    "borrow": "Borrow",
+    "available": "Available",
+    "totalStock": "Total Stock",
+    "copies": "copies",
+    "backToCatalog": "Back to Catalog",
+    "genre": "Genre Classification",
+    "isbn": "ISBN Number",
+    "acquisitionCode": "Acquisition code",
+    "bookOverview": "Book Overview",
+    "noSynopsis": "No book synopsis provided. Standard library lending terms apply.",
+    "readyToBorrow": "Ready to request borrowing?",
+    "readyToBorrowSub": "Maximum initial period and standard rules apply.",
+    "borrowCopy": "Borrow Copy",
+    "loading": "Loading catalog...",
+    "noBooks": "No books found matching your search. Try adjusting the query!"
+  },
+  "notificationsPanel": {
+    "title": "Notifications",
+    "markAllRead": "Mark all read",
+    "noNotifications": "No notifications yet.",
+    "viewAll": "View All Notifications"
+  },
+  "loans": {
+    "title": "Active Book Loans",
+    "description": "Track your checked-out books, return dates, and request extension periods.",
+    "loading": "Loading loan records...",
+    "noLoans": "You do not have any active loan records. Browse the catalog to borrow books!",
+    "loanId": "Loan ID",
+    "borrowDate": "Borrow Date",
+    "dueDate": "Due Date",
+    "overdue": "OVERDUE",
+    "extend": "Extend",
+    "returnBook": "Return Book",
+    "returnedOn": "Returned On",
+    "activeStatus": "BORROWED"
+  },
+  "profile": {
+    "title": "Personal Library Details",
+    "description": "Customize your profile card and system contact information details.",
+    "success": "✨ Profile card updated successfully!",
+    "saving": "Saving Profile...",
+    "save": "Save Profile Details",
+    "phone": "Phone Number",
+    "avatarUrl": "Avatar URL",
+    "address": "Street Address",
+    "bio": "Short Biography",
+    "memberId": "Member ID"
+  },
+  "rules": {
+    "title": "Library Regulations FAQ",
+    "description": "Click on any guideline category to reveal specific borrowing parameters, policies, and details.",
+    "loading": "Loading regulations...",
+    "bannerTitle": "Need Additional Assistance?",
+    "bannerText": "If you have questions regarding specialized archives, reference-only manuscripts, or late fee waivers, please speak to a librarian directly at the desk or email us at support@library.com."
+  },
+  "notificationsPage": {
+    "title": "Notification Inbox",
+    "description": "Stay updated on your loan statuses, library reminders, and rule updates.",
+    "markAllRead": "Mark All as Read",
+    "clearTitle": "Your inbox is clear",
+    "clearText": "You have no new alerts, reminders, or rule changes from the library staff.",
+    "delete": "Delete Notification",
+    "markAsRead": "Mark as Read"
+  }
+}

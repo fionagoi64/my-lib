@@ -1,0 +1,197 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// =========================
+// ROLES & PERMISSIONS
+// =========================
+
+model Role {
+  id          String           @id @default(uuid())
+  name        String           @unique
+  description String?
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+  deletedAt   DateTime?        @map("deleted_at")
+  users       User[]
+  permissions RolePermission[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id        String           @id @default(uuid())
+  name      String           @unique
+  createdAt DateTime         @default(now()) @map("created_at")
+  deletedAt DateTime?        @map("deleted_at")
+  roles     RolePermission[]
+
+  @@map("permissions")
+}
+
+model RolePermission {
+  roleId       String     @map("role_id")
+  permissionId String     @map("permission_id")
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+// =========================
+// USERS
+// =========================
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String?
+  isActive  Boolean  @default(true) @map("is_active")
+  roleId    String   @map("role_id")
+  role      Role     @relation(fields: [roleId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profile       UserProfile?
+  sessions      UserSession[]
+  resets        PasswordReset[]
+  borrows       BorrowRecord[]
+  notifications Notification[]
+  rulesCreated  LibraryRule[]   @relation("RulesCreated")
+  rulesUpdated  LibraryRule[]   @relation("RulesUpdated")
+
+  @@map("users")
+}
+
+model UserProfile {
+  id        String    @id @default(uuid())
+  userId    String    @unique @map("user_id")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  phone     String?
+  address   String?
+  avatarUrl String?   @map("avatar_url")
+  bio       String?
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("user_profiles")
+}
+
+model UserSession {
+  id           String    @id @default(uuid())
+  userId       String    @map("user_id")
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshToken String    @map("refresh_token")
+  expiresAt    DateTime  @map("expires_at")
+  revokedAt    DateTime? @map("revoked_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  @@map("user_sessions")
+}
+
+model PasswordReset {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String    @unique
+  expiresAt DateTime  @map("expires_at")
+  used      Boolean   @default(false)
+  createdAt DateTime  @default(now()) @map("created_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("password_resets")
+}
+
+// =========================
+// BOOKS & INVENTORY
+// =========================
+
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String?
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+  books       Book[]
+
+  @@map("categories")
+}
+
+model Book {
+  id             Int            @id @default(autoincrement())
+  title          String
+  author         String
+  isbn           String?        @unique
+  description    String?
+  stockTotal     Int            @map("stock_total")
+  stockAvailable Int            @map("stock_available")
+  categoryId     Int            @map("category_id")
+  category       Category       @relation(fields: [categoryId], references: [id])
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+  deletedAt      DateTime?      @map("deleted_at")
+  borrowRecords  BorrowRecord[]
+
+  @@map("books")
+}
+
+// =========================
+// OPERATIONS & FEATURES
+// =========================
+
+model BorrowRecord {
+  id            Int       @id @default(autoincrement())
+  userId        String    @map("user_id")
+  user          User      @relation(fields: [userId], references: [id])
+  bookId        Int       @map("book_id")
+  book          Book      @relation(fields: [bookId], references: [id])
+  borrowDate    DateTime  @map("borrow_date")
+  dueDate       DateTime  @map("due_date")
+  returnDate    DateTime? @map("return_date")
+  status        String    @default("BORROWED")
+  extendedCount Int       @default(0) @map("extended_count")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  deletedAt     DateTime? @map("deleted_at")
+
+  @@map("borrow_records")
+}
+
+model Notification {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String
+  title     String
+  message   String
+  isRead    Boolean   @default(false) @map("is_read")
+  createdAt DateTime  @default(now()) @map("created_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("notifications")
+}
+
+model LibraryRule {
+  id        Int       @id @default(autoincrement())
+  title     String
+  content   String
+  createdBy String    @map("created_by")
+  creator   User      @relation("RulesCreated", fields: [createdBy], references: [id])
+  updatedBy String    @map("updated_by")
+  updater   User      @relation("RulesUpdated", fields: [updatedBy], references: [id])
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("library_rules")
+}
