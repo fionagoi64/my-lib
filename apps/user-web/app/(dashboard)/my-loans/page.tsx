@@ -52,6 +52,9 @@ export default function MyLoansPage() {
         alert(i18n.language === "zh" ? "还书成功！感谢您的借阅。" : "Book returned successfully! Thank you.");
         refetchLoans();
       },
+      onError: (err: any) => {
+        alert(err.response?.data?.message || (i18n.language === "zh" ? "无法归还此图书。" : "Unable to return this book."));
+      },
     });
   };
 
@@ -81,12 +84,33 @@ export default function MyLoansPage() {
 
   const paginatedLoans = filteredLoans.slice((loanPage - 1) * loanPageSize, loanPage * loanPageSize);
   const totalLoanPages = Math.ceil(filteredLoans.length / loanPageSize) || 1;
+  const activeLoans = myLoans?.filter((loan) => loan.status === "BORROWED") || [];
+  const overdueLoans = activeLoans.filter((loan) => new Date(loan.dueDate) < new Date());
+  const dueSoonLoans = activeLoans.filter((loan) => {
+    const daysUntilDue = Math.ceil((new Date(loan.dueDate).getTime() - Date.now()) / 86_400_000);
+    return daysUntilDue >= 0 && daysUntilDue <= 3;
+  });
 
   return (
     <div className="space-y-6">
       <div>
         <h3 className="text-2xl font-extrabold text-white tracking-tight">{t("loans.title")}</h3>
         <p className="text-zinc-500 text-xs mt-0.5">{t("loans.description")}</p>
+      </div>
+
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="rounded-2xl border border-blue-500/20 bg-blue-500/5 p-4">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Active loans</p>
+          <p className="mt-1 text-2xl font-extrabold text-blue-300">{activeLoans.length}</p>
+        </div>
+        <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Due within 3 days</p>
+          <p className="mt-1 text-2xl font-extrabold text-amber-300">{dueSoonLoans.length}</p>
+        </div>
+        <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-4">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Overdue</p>
+          <p className="mt-1 text-2xl font-extrabold text-red-300">{overdueLoans.length}</p>
+        </div>
       </div>
 
       {/* Search and Selection Filters Row */}
@@ -178,6 +202,7 @@ export default function MyLoansPage() {
           {paginatedLoans.map((loan) => {
             const isOverdue = new Date(loan.dueDate) < new Date() && loan.status === "BORROWED";
             const isReturned = loan.status === "RETURNED";
+            const daysUntilDue = Math.ceil((new Date(loan.dueDate).getTime() - Date.now()) / 86_400_000);
             
             return (
               <div
@@ -214,6 +239,11 @@ export default function MyLoansPage() {
                       <span className={`font-bold ${isOverdue ? "text-red-400" : "text-zinc-300"}`}>
                         {new Date(loan.dueDate).toLocaleDateString()}
                       </span>
+                      {!isReturned && (
+                        <span className={`mt-0.5 block text-[10px] ${isOverdue ? "text-red-400" : daysUntilDue <= 3 ? "text-amber-400" : "text-zinc-500"}`}>
+                          {isOverdue ? `${Math.abs(daysUntilDue)} day(s) overdue` : `${daysUntilDue} day(s) remaining`}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
