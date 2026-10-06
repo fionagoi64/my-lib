@@ -1,9 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsIn } from 'class-validator';
 
 export class UpdateRoleDto {
   @ApiProperty({ example: 'ADMIN' })
-  @IsNotEmpty()
-  @IsString()
+  @Transform(({ value }) => typeof value === 'string' ? value.trim().toUpperCase() : value)
+  @IsIn(['USER', 'ADMIN', 'LIBRARIAN'])
   roleName: string;
 }

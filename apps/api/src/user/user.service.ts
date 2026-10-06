@@ -129,23 +129,12 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
 
-    // Find the target role
-    let role = await this.prisma.role.findUnique({
+    const role = await this.prisma.role.findUnique({
       where: { name: roleName },
     });
 
-    // Create the role dynamically if it is a standard one that is missing
     if (!role) {
-      const allowedRoles = ['USER', 'ADMIN', 'LIBRARIAN'];
-      if (!allowedRoles.includes(roleName)) {
-        throw new NotFoundException(`Role "${roleName}" is not valid or registered.`);
-      }
-      role = await this.prisma.role.create({
-        data: {
-          name: roleName,
-          description: `${roleName} Role`,
-        },
-      });
+      throw new NotFoundException(`Role "${roleName}" is not configured.`);
     }
 
     // Update the user's role
