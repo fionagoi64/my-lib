@@ -35,7 +35,7 @@ import { useState, useEffect } from "react";
 export default function NotificationsPage() {
   const { t, i18n } = useTranslation();
 
-  const { data: notifications, refetch: refetchNotifications } = useMyNotifications();
+  const { data: notifications, refetch: refetchNotifications, isLoading, isError } = useMyNotifications();
   const markNotificationRead = useMarkNotificationRead();
   const markAllNotificationsRead = useMarkAllNotificationsRead();
   const deleteNotification = useDeleteNotification();
@@ -90,9 +90,10 @@ export default function NotificationsPage() {
         {unreadCount > 0 && (
           <button
             onClick={() => markAllNotificationsRead.mutate()}
+            disabled={markAllNotificationsRead.isPending}
             className="px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/20 hover:border-blue-500/30 text-xs font-bold rounded-xl transition-all active:scale-95 cursor-pointer outline-none"
           >
-            {t("notificationsPage.markAllRead")}
+            {markAllNotificationsRead.isPending ? "Saving…" : t("notificationsPage.markAllRead")}
           </button>
         )}
       </div>
@@ -180,8 +181,17 @@ export default function NotificationsPage() {
         </div>
       )}
 
-      <div className="space-y-3">
-        {paginatedNotifications.length > 0 ? (
+      <div className="space-y-3" aria-live="polite">
+        {isLoading ? (
+          <div className="py-16 text-center text-xs font-semibold text-zinc-500">Loading notifications…</div>
+        ) : isError ? (
+          <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-6 text-center">
+            <p className="text-sm font-bold text-red-300">Unable to load notifications.</p>
+            <button onClick={() => refetchNotifications()} className="mt-3 rounded-xl border border-red-500/30 px-3 py-2 text-xs font-bold text-red-200 hover:bg-red-500/10">
+              Try again
+            </button>
+          </div>
+        ) : paginatedNotifications.length > 0 ? (
           paginatedNotifications.map((n) => (
             <div
               key={n.id}
@@ -222,6 +232,7 @@ export default function NotificationsPage() {
                 {!n.isRead && (
                   <button
                     onClick={() => markNotificationRead.mutate(n.id)}
+                    disabled={markNotificationRead.isPending}
                     className="p-2 bg-zinc-900/50 hover:bg-zinc-900 text-blue-400 border border-zinc-800 hover:border-zinc-700 rounded-xl transition-all cursor-pointer outline-none"
                     title={t("notificationsPage.markAsRead")}
                   >
@@ -254,7 +265,7 @@ export default function NotificationsPage() {
                       <AlertDialogCancel>
                         {getConfirmText("confirm.cancel", "Cancel", "取消")}
                       </AlertDialogCancel>
-                      <AlertDialogAction onClick={() => deleteNotification.mutate(n.id)} className="bg-red-600 hover:bg-red-700 text-white!">
+                      <AlertDialogAction disabled={deleteNotification.isPending} onClick={() => deleteNotification.mutate(n.id)} className="bg-red-600 hover:bg-red-700 text-white!">
                         {getConfirmText("confirm.deleteNotificationAction", "Delete", "删除")}
                       </AlertDialogAction>
                     </AlertDialogFooter>
