@@ -127,7 +127,7 @@ export default function AdminLoginPage() {
     setAuthSuccess("");
 
     loginMutation.mutate(
-      { email, password },
+      { email: email.trim().toLowerCase(), password },
       {
         onSuccess: (data) => {
           const role = data.user?.role;
@@ -257,13 +257,13 @@ export default function AdminLoginPage() {
             </div>
 
             {authError && (
-              <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-medium text-center">
+              <div role="alert" className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-medium text-center">
                 ⚠️ {authError}
               </div>
             )}
 
             {authSuccess && (
-              <div className="p-3 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-medium text-center animate-pulse">
+              <div role="status" className="p-3 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-medium text-center animate-pulse">
                 ✨ {authSuccess}
               </div>
             )}
@@ -272,11 +272,16 @@ export default function AdminLoginPage() {
               <div>
                 <label className="block text-zinc-400 text-xs font-semibold mb-1.5 uppercase tracking-wide text-left">{t("admin.login.emailLabel")}</label>
                 <Input
+                  id="email"
                   type="email"
                   required
+                  autoComplete="username"
                   placeholder="admin@library.com"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setAuthError("");
+                  }}
                   className="w-full bg-zinc-950 border border-zinc-855 focus:border-red-500 focus:ring-1 focus:ring-red-500 rounded-xl px-4 py-3 text-sm outline-none transition-all text-white h-11"
                 />
               </div>
@@ -293,11 +298,17 @@ export default function AdminLoginPage() {
                 </div>
                 <div className="relative">
                   <Input
+                    id="password"
                     type={showPassword ? "text" : "password"}
                     required
+                    minLength={6}
+                    autoComplete="current-password"
                     placeholder="••••••••"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setAuthError("");
+                    }}
                     className="w-full bg-zinc-950 border border-zinc-855 focus:border-red-500 focus:ring-1 focus:ring-red-500 rounded-xl pl-4 pr-12 py-3 text-sm outline-none transition-all text-white h-11"
                   />
                   <button
