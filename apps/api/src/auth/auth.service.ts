@@ -136,6 +136,10 @@ export class AuthService {
         throw new UnauthorizedException('Invalid or expired refresh token session');
       }
 
+      if (payload.sub !== session.user.id || !session.user.isActive) {
+        throw new UnauthorizedException('Invalid or expired refresh token');
+      }
+
       const newPayload = {
         sub: session.user.id,
         email: session.user.email,
@@ -154,19 +158,13 @@ export class AuthService {
   }
 
   async logout(refreshToken: string) {
-    const session = await this.prisma.userSession.findFirst({
+    await this.prisma.userSession.updateMany({
       where: {
         refreshToken,
         revokedAt: null,
       },
+      data: { revokedAt: new Date() },
     });
-
-    if (session) {
-      await this.prisma.userSession.update({
-        where: { id: session.id },
-        data: { revokedAt: new Date() },
-      });
-    }
 
     return { message: 'Logged out successfully' };
   }

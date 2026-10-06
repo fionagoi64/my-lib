@@ -1,8 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
 
 export class RefreshTokenDto {
   @ApiProperty({ example: 'your-refresh-token-here' })
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   @IsNotEmpty()
+  @IsString()
+  @MaxLength(4096)
   refreshToken: string;
 }
