@@ -43,6 +43,7 @@ export default function AdminRulesPage() {
   const [editingRuleId, setEditingRuleId] = useState<number | null>(null);
   const [ruleTitle, setRuleTitle] = useState("");
   const [ruleContent, setRuleContent] = useState("");
+  const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
   const { data: dbRules, refetch: refetchRules } = useRules();
   const createRuleMutation = useCreateRule();
@@ -74,11 +75,11 @@ export default function AdminRulesPage() {
   const handleDeleteRule = (id: number) => {
     deleteRuleMutation.mutate(id, {
       onSuccess: () => {
-        alert("Regulation deleted.");
+        setFeedback({ type: "success", message: "Regulation deleted." });
         refetchRules();
       },
       onError: (err: any) => {
-        alert(err.response?.data?.message || "Could not delete rule.");
+        setFeedback({ type: "error", message: err.response?.data?.message || "Could not delete regulation." });
       },
     });
   };
@@ -90,30 +91,30 @@ export default function AdminRulesPage() {
       updateRuleMutation.mutate(
         {
           id: editingRuleId,
-          payload: { title: ruleTitle, content: ruleContent },
+          payload: { title: ruleTitle.trim(), content: ruleContent.trim() },
         },
         {
           onSuccess: () => {
-            alert("Regulation specs updated successfully!");
+            setFeedback({ type: "success", message: "Regulation updated successfully." });
             resetRuleForm();
             refetchRules();
           },
           onError: (err: any) => {
-            alert(err.response?.data?.message || "Error updating regulation specs.");
+            setFeedback({ type: "error", message: err.response?.data?.message || "Could not update regulation." });
           },
         }
       );
     } else {
       createRuleMutation.mutate(
-        { title: ruleTitle, content: ruleContent },
+        { title: ruleTitle.trim(), content: ruleContent.trim() },
         {
           onSuccess: () => {
-            alert("Regulation registered successfully!");
+            setFeedback({ type: "success", message: "Regulation created successfully." });
             resetRuleForm();
             refetchRules();
           },
           onError: (err: any) => {
-            alert(err.response?.data?.message || "Error adding regulation.");
+            setFeedback({ type: "error", message: err.response?.data?.message || "Could not create regulation." });
           },
         }
       );
@@ -141,6 +142,8 @@ export default function AdminRulesPage() {
           {showAddRule ? "Close Panel" : "Create Regulation"}
         </button>
       </div>
+
+      {feedback && <div role={feedback.type === "error" ? "alert" : "status"} className={`rounded-xl border px-4 py-3 text-sm ${feedback.type === "error" ? "border-red-500/30 bg-red-500/10 text-red-300" : "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"}`}>{feedback.message}</div>}
 
       {/* Add / Edit Rule Form Panel */}
       {showAddRule && (
