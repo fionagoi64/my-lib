@@ -16,6 +16,7 @@ export default function ProfilePage() {
   const [bio, setBio] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
   const [profileSuccess, setProfileSuccess] = useState(false);
+  const [profileError, setProfileError] = useState("");
 
   // Pre-fill profile state when profile data loads
   useEffect(() => {
@@ -30,13 +31,21 @@ export default function ProfilePage() {
   const handleUpdateProfile = (e: React.FormEvent) => {
     e.preventDefault();
     setProfileSuccess(false);
+    setProfileError("");
+    if (avatarUrl && !/^https?:\/\//i.test(avatarUrl)) {
+      setProfileError("Avatar URL must start with http:// or https://.");
+      return;
+    }
     updateProfileMutation.mutate(
-      { phone, address, bio, avatarUrl },
+      { phone: phone.trim(), address: address.trim(), bio: bio.trim(), avatarUrl: avatarUrl.trim() },
       {
         onSuccess: () => {
           setProfileSuccess(true);
           setTimeout(() => setProfileSuccess(false), 3000);
           refetchProfile();
+        },
+        onError: (error: any) => {
+          setProfileError(error.response?.data?.message || "We could not save your profile. Please try again.");
         },
       }
     );
@@ -83,6 +92,11 @@ export default function ProfilePage() {
           {t("profile.success")}
         </div>
       )}
+      {profileError && (
+        <div role="alert" className="p-3 bg-red-500/10 border border-red-500/20 text-red-300 text-xs font-semibold rounded-xl text-center">
+          {profileError}
+        </div>
+      )}
 
       <form onSubmit={handleUpdateProfile} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -91,7 +105,7 @@ export default function ProfilePage() {
               {t("profile.phone")}
             </label>
             <Input
-              type="text"
+              type="tel"
               placeholder="+1 (555) 123-4567"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
@@ -131,11 +145,13 @@ export default function ProfilePage() {
           </label>
           <textarea
             rows={4}
+            maxLength={500}
             placeholder="Avid science fiction reader, software engineer..."
             value={bio}
             onChange={(e) => setBio(e.target.value)}
             className="w-full bg-zinc-950 border border-zinc-800 focus:border-blue-500 rounded-xl px-4 py-3 text-sm outline-none text-white transition-all resize-none"
           />
+          <p className="mt-1 text-right text-[10px] text-zinc-500">{bio.length}/500</p>
         </div>
 
         <div className="pt-4 border-t border-zinc-900 flex justify-end">
