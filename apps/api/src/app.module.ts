@@ -7,8 +7,9 @@ import { BorrowModule } from './borrow/borrow.module';
 import { RulesModule } from './rules/rules.module';
 import { NotificationModule } from './notification/notification.module';
 import { OpenLibraryModule } from './open-library/open-library.module';
+import { PublicModule } from './public/public.module';
 
 @Module({
-  imports: [PrismaModule, UserModule, AuthModule, BooksModule, BorrowModule, RulesModule, NotificationModule, OpenLibraryModule],
+  imports: [PrismaModule, UserModule, AuthModule, BooksModule, BorrowModule, RulesModule, NotificationModule, OpenLibraryModule, PublicModule],
 })
 export class AppModule {}
