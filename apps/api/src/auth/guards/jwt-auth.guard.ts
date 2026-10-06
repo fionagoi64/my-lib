@@ -7,9 +7,14 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 
+import { PrismaService } from '@/prisma/prisma.service';
+
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly prisma: PrismaService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
@@ -21,7 +26,18 @@ export class JwtAuthGuard implements CanActivate {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: process.env.JWT_SECRET || 'fallback-secret-key-12345',
       });
-      request['user'] = payload;
+      const user = await this.prisma.user.findUnique({
+        where: { id: payload.sub },
+        include: { role: true },
+      });
+
+      if (!user || !user.isActive) {
+        throw new UnauthorizedException('Authentication token is no longer valid');
+      }
+
+      // Roles are read from the database for every protected request so a
+      // demotion takes effect immediately, rather than when the JWT expires.
+      request['user'] = { sub: user.id, email: user.email, role: user.role.name };
     } catch {
       throw new UnauthorizedException('Invalid or expired authentication token');
     }
